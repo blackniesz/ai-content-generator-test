@@ -90,10 +90,16 @@ def show_analyzer_tab(api_keys, produkty_db, products_loaded):
         if not products_loaded:
             st.warning("⚠️ Analiza produktów nie jest dostępna - brak bazy danych produktów.")
         
+
         # Analysis results
         if analyze_button and products_loaded:
             with st.spinner("🔍 Analizuję tekst i szukam miejsc na produkty..."):
                 try:
+                    st.write("🔍 DEBUG: Rozpoczynam analizę...")
+                    st.write(f"📝 DEBUG: Tekst ma {len(text_to_analyze)} znaków")
+                    st.write(f"🛍️ DEBUG: Produktów w bazie: {len(produkty_db)}")
+                    st.write(f"🔑 DEBUG: OpenAI key: {'✅ Jest' if api_keys.get('openai') else '❌ Brak'}")
+                    
                     # Analyze text for product opportunities
                     recommendations = analyze_text_for_products(
                         text_to_analyze, 
@@ -101,22 +107,13 @@ def show_analyzer_tab(api_keys, produkty_db, products_loaded):
                         api_keys['openai']
                     )
                     
+                    st.write(f"💡 DEBUG: Znaleziono {len(recommendations)} rekomendacji")
+                    
                     # Filter recommendations by quality
                     filtered_recommendations = filter_recommendations_by_quality(recommendations, min_threshold=0.4)
                     
-                    # Inform user if some recommendations were filtered out
-                    if len(recommendations) > len(filtered_recommendations):
-                        filtered_count = len(recommendations) - len(filtered_recommendations)
-                        st.info(f"ℹ️ Odrzucono {filtered_count} słabo dopasowanych produktów. Pozostawiono tylko te, które dobrze pasują do kontekstu.")
+                    st.write(f"✅ DEBUG: Po filtrowaniu: {len(filtered_recommendations)} rekomendacji")
                     
-                    # Store in session state
-                    st.session_state.analyzed_text = text_to_analyze
-                    st.session_state.product_recommendations = filtered_recommendations
-                    
-                    st.rerun()
-                    
-                except Exception as e:
-                    st.error(f"❌ Błąd analizy: {e}")
     
     # Show recommendations if available
     if hasattr(st.session_state, 'product_recommendations') and st.session_state.product_recommendations:
