@@ -286,6 +286,92 @@ def calculate_semantic_similarity(text1, text2):
     except:
         return 0.0
 
+# Backward compatibility functions for generator.py
+def find_matching_products(content, products_db, threshold=0.3):
+    """Find products matching content - backward compatibility function"""
+    if not content or not products_db:
+        return []
+    
+    matching_products = []
+    content_lower = content.lower()
+    
+    for product in products_db:
+        # Simple keyword matching for backward compatibility
+        product_text = f"{product['nazwa']} {product['zastosowanie']}".lower()
+        
+        # Calculate basic similarity
+        similarity = calculate_semantic_similarity(content_lower, product_text)
+        
+        if similarity >= threshold:
+            product_copy = product.copy()
+            product_copy['similarity'] = similarity
+            matching_products.append(product_copy)
+    
+    # Sort by similarity
+    matching_products.sort(key=lambda x: x['similarity'], reverse=True)
+    return matching_products[:5]  # Return top 5
+
+def generate_product_content(product, content_type, client):
+    """Generate content for a product - backward compatibility function"""
+    try:
+        if content_type == "opis":
+            prompt = f"""
+Napisz profesjonalny opis produktu kosmetycznego.
+
+PRODUKT:
+- Nazwa: {product['nazwa']}
+- Zastosowanie: {product['zastosowanie']}
+- Cena: {product.get('cena', 'N/A')}
+
+Napisz zwięzły, atrakcyjny opis (2-3 zdania) podkreślający korzyści i zastosowanie.
+Użyj profesjonalnego, ale przystępnego języka.
+"""
+        elif content_type == "artykul":
+            prompt = f"""
+Napisz krótki artykuł edukacyjny o produkcie kosmetycznym.
+
+PRODUKT:
+- Nazwa: {product['nazwa']}
+- Zastosowanie: {product['zastosowanie']}
+
+Napisz artykuł (4-5 akapitów) obejmujący:
+- Czym jest produkt i do czego służy
+- Jak działa i jakie ma składniki aktywne
+- Dla kogo jest przeznaczony
+- Jak stosować
+- Podsumowanie korzyści
+
+Użyj eksperckiego, ale przystępnego języka.
+"""
+        else:  # social media post
+            prompt = f"""
+Napisz angażujący post na social media o produkcie kosmetycznym.
+
+PRODUKT:
+- Nazwa: {product['nazwa']}
+- Zastosowanie: {product['zastosowanie']}
+
+Napisz krótki, chwytliwy post (2-3 zdania) z:
+- Ciekawym hookiem
+- Korzyściami produktu
+- Call-to-action
+- Odpowiednimi emoji
+
+Styl: przyjazny, zachęcający, autentyczny.
+"""
+
+        message = client.messages.create(
+            model="claude-3-haiku-20240307",
+            max_tokens=500,
+            temperature=0.7,
+            messages=[{"role": "user", "content": prompt}]
+        )
+        
+        return message.content[0].text.strip()
+        
+    except Exception as e:
+        return f"Błąd generowania treści: {e}"
+
 def generate_product_suggestion(paragraph_text, product, suggestion_type, anthropic_client):
     """Generate contextual product suggestion with better context understanding"""
     
