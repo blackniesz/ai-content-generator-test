@@ -4,6 +4,8 @@ from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 import re
 import anthropic
+import pandas as pd
+import streamlit as st
 
 # Klasyfikacja typów akapitów
 PARAGRAPH_TYPES = {
@@ -286,7 +288,58 @@ def calculate_semantic_similarity(text1, text2):
     except:
         return 0.0
 
-# Backward compatibility functions for generator.py
+# Backward compatibility functions for generator.py and app.py
+def load_products_database():
+    """Load products database - backward compatibility function"""
+    try:
+        # Try to load from CSV if it exists
+        df = pd.read_csv('produkty_dr_ambroziak.csv')
+        
+        # Convert DataFrame to list of dictionaries
+        products = []
+        for _, row in df.iterrows():
+            product = {
+                'nazwa': row.get('nazwa', ''),
+                'zastosowanie': row.get('zastosowanie', ''),
+                'cena': row.get('cena', 'N/A'),
+                'url': row.get('url', '#')
+            }
+            # Skip empty products
+            if product['nazwa'] and product['zastosowanie']:
+                products.append(product)
+        
+        return products
+        
+    except FileNotFoundError:
+        # Return demo products if CSV doesn't exist
+        st.warning("⚠️ Plik produkty_dr_ambroziak.csv nie został znaleziony. Używam przykładowych produktów.")
+        return get_demo_products()
+    except Exception as e:
+        st.error(f"❌ Błąd wczytywania bazy produktów: {e}")
+        return get_demo_products()
+
+def get_demo_products():
+    """Return demo products for testing"""
+    return [
+        {
+            'nazwa': 'Serum Na Przebarwienia Z Kwasem Kojowym',
+            'zastosowanie': 'cera trądzikowa, nawilżanie, ochrona słoneczna, rozjaśnianie',
+            'cena': '1025,00zł',
+            'url': 'https://example.com/serum'
+        },
+        {
+            'nazwa': 'Krem Do Cery Naczynkowej z SPF 15',
+            'zastosowanie': 'cera wrażliwa, naczynka, ochrona UV, nawilżanie',
+            'cena': '340,00zł', 
+            'url': 'https://example.com/krem'
+        },
+        {
+            'nazwa': 'Żel Oczyszczający Przeciwtrądzikowy',
+            'zastosowanie': 'oczyszczanie, cera tłusta, trądzik, regulacja sebum',
+            'cena': '89,00zł',
+            'url': 'https://example.com/zel'
+        }
+    ]
 def find_matching_products(content, products_db, threshold=0.3):
     """Find products matching content - backward compatibility function"""
     if not content or not products_db:
