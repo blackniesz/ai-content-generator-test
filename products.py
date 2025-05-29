@@ -373,3 +373,60 @@ Odpowiedz TYLKO przeredagowanym akapitem.
         
     except Exception as e:
         return f"Błąd generowania sugestii: {e}"
+
+# ========================================
+# SIMPLE PUBLIC WRAPPER  ─ find_matching_products
+# ========================================
+def find_matching_products(topic: str,
+                           section_title: str,
+                           produkty_db: list[dict],
+                           openai_api_key: str | None = None) -> list[dict]:
+    """
+    Zwraca listę maks. 3 produktów najlepiej pasujących do
+    połączenia (topic + section_title).  Każdy produkt dostaje pole
+    'similarity', którego używa generator.py przy wyświetlaniu.
+    """
+    # 1) Traktujemy sekcyjny nagłówek jako "akapit" do analizy
+    pseudo_paragraph = f"{topic}. {section_title}"
+    
+    # 2) Klasyfikujemy kontekst (leczenie, pielęgnacja itd.)
+    paragraph_type = classify_paragraph_type(pseudo_paragraph)
+    
+    # 3) Szukamy tematu pielęgnacyjnego (acne, aging…) z uwzględnieniem słów zabiegowych
+    paragraph_topics = identify_treatment_context(pseudo_paragraph)
+    if not paragraph_topics:
+        return []          # brak oczywistego kontekstu → nic nie sugerujemy
+    
+    # 4) Wyciągamy najlepiej dopasowane produkty
+    best_products = find_contextually_relevant_products(
+        pseudo_paragraph,
+        paragraph_topics,
+        paragraph_type,
+        produkty_db
+    )
+    
+    # 5) Policzmy prosty współczynnik podobieństwa TF-IDF,
+    #     żeby mieć czytelną liczbę w generator.py
+    try:
+        from sklearn.feature_extraction.text import TfidfVectorizer
+        from sklearn.metrics.pairwise import cosine_similarity
+        import numpy as np
+        
+        # budujemy korpus: zapytanie + opisy produktów
+        query = pseudo_paragraph.lower()
+        docs = [query] + [
+            f"{p['nazwa']} {p['zastosowanie']}".lower()
+            for p in best_products
+        ]
+        tfidf = TfidfVectorizer(max_features=4000).fit_transform(docs)
+        sims = cosine_similarity(tfidf[0:1], tfidf[1:]).flatten()
+        
+        for prod, sim in zip(best_products, sims):
+            prod["similarity"] = float(sim)  # 0-1, przyda się do formatowania %
+    except Exception:
+        # biblioteka nieobecna?  dodaj neutralne 0.0
+        for prod in best_products:
+            prod["similarity"] = 0.0
+    
+    return best_products[:3]
+
