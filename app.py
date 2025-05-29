@@ -660,19 +660,13 @@ def main():
         
         with preview_col:
             st.markdown("**👁️ Podgląd na żywo:**")
-            with st.container():
-                # Custom container with scrolling
-                st.markdown("""
-                <div style="height: 500px; overflow-y: auto; border: 1px solid #e0e0e0; padding: 1rem; border-radius: 5px; background-color: #fafafa;">
-                """, unsafe_allow_html=True)
-                
-                # Show preview of edited article
+            # Scrollable preview container
+            preview_container = st.container(height=500)
+            with preview_container:
                 if edited_article.strip():
                     st.markdown(edited_article)
                 else:
                     st.info("Wpisz tekst po lewej stronie, aby zobaczyć podgląd")
-                
-                st.markdown("</div>", unsafe_allow_html=True)
         
         # Update edited article
         if edited_article != st.session_state.edited_article:
