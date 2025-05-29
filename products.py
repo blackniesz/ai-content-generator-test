@@ -123,7 +123,7 @@ Styl: przyjazny, zachęcający, autentyczny.
 """
 
         message = client.messages.create(
-            model="claude-3-haiku-20240307",
+            model="claude-3-7-sonnet-20250219",
             max_tokens=500,
             temperature=0.7,
             messages=[{"role": "user", "content": prompt}]
@@ -164,7 +164,7 @@ Odpowiedz TYLKO przeredagowanym akapitem lub "PRODUKT_NIE_PASUJE_DO_KONTEKSTU".
 
     try:
         message = anthropic_client.messages.create(
-            model="claude-3-haiku-20240307",
+            model="claude-3-7-sonnet-20250219",
             max_tokens=600,
             temperature=0.2,
             messages=[{"role": "user", "content": prompt}]
