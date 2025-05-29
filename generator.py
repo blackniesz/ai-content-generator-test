@@ -555,7 +555,7 @@ def analyze_facts(content, topic, anthropic_key):
     
     try:
         response = client.messages.create(
-            model="claude-3-5-sonnet-20241022",
+            model="claude-3-7-sonnet-20250219",
             max_tokens=1500,
             messages=[{"role": "user", "content": prompt}]
         )
@@ -576,11 +576,12 @@ def create_outline(topic, facts, target_words, anthropic_key):
 
     WYMAGANIA:
     1. Tytuł główny (H1) - atrakcyjny, SEO-friendly, zawierający główne słowo kluczowe
-    2. Krótki wstęp (3-5 zdań) - zajawka bez użycia zwrotów typu "w tym artykule"
+    2. Krótki wstęp (3-5 zdań) - zajawka bez użycia zwrotów typu "w tym artykule", z naturalnym hookiem.
     3. 5-7 śródtytułów (H2) - zróżnicowanych, zawierających long-tail keywords
     4. Dla każdego H2 krótki opis treści (1-2 zdania)
     5. Cel: około {target_words} słów w całym artykule
-    6. Styl: przyjazny, lifestyle'owy, praktyczny, user-friendly
+    6. Styl: przyjazny, lifestyle'owy, praktyczny, user-friendly. Wciel się w rolę pomocnego przewodnika po temacie.
+    7. Wyeliminuj wszelkie słowa i zwroty, które mogą świadczyć o AI, takie jak: kluczowy, innowacyjny, holistyczny, nowatorski itp. 
 
     Format markdown:
     # Główny tytuł H1
@@ -593,7 +594,7 @@ def create_outline(topic, facts, target_words, anthropic_key):
     ## 2. Drugi śródtytuł H2  
     Opis: Co będzie w tej sekcji...
     
-    STRUKTURA POWINNA BYĆ UROZMAICONA - niektóre sekcje mogą zawierać listy punktowane tam gdzie to zasadne.
+    STRUKTURA POWINNA BYĆ UROZMAICONA - niektóre sekcje mogą zawierać listy punktowane, ale tylko tam, gdzie to zasadne.
     """
     
     try:
@@ -652,13 +653,14 @@ def write_section(topic, outline, facts, section_title, written_sections, remain
     - Jeśli znajdziesz naturalne miejsce, subtelnie wspomniej o produkcie Dr Ambroziak (bez forsowania!)
     - Format: markdown (bez nagłówka H2 - zostanie dodany automatycznie)
     - Używaj pogrubień **tekst** dla kluczowych pojęć
+    - Wyeliminuj wszelkie słowa i zwroty, które mogą świadczyć o AI, takie jak: kluczowy, innowacyjny, holistyczny, nowatorski itp.
     
     Zwróć TYLKO treść sekcji, bez dodatkowych komentarzy.
     """
     
     try:
         response = client.messages.create(
-            model="claude-3-5-sonnet-20241022",
+            model="claude-3-7-sonnet-20250219",
             max_tokens=2500,
             messages=[{"role": "user", "content": prompt}]
         )
