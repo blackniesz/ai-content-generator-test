@@ -77,8 +77,8 @@ SKINCARE_TOPICS = {
     }
 }
 
-def analyze_text_for_products(text, produkty_db, openai_api_key):
-    """Enhanced analysis that understands paragraph context"""
+def analyze_text_for_products(text, produkty_db, anthropic_api_key):
+    """Enhanced analysis that understands paragraph context using Claude"""
     
     paragraphs = [p.strip() for p in text.split('\n\n') if p.strip()]
     recommendations = []
@@ -295,8 +295,8 @@ def load_products_database():
     """Load products database from embeddings file - backward compatibility function"""
     try:
         # Try to load from embeddings pickle file
-        if os.path.exists('dr_ambroziak_embeddings.pkl'):
-            with open('dr_ambroziak_embeddings.pkl', 'rb') as f:
+        if os.path.exists('dr_ambroziak_embbedings.pkl'):
+            with open('dr_ambroziak_embbedings.pkl', 'rb') as f:
                 data = pickle.load(f)
             
             # Extract products from embeddings data
