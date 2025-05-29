@@ -466,7 +466,7 @@ def generate_article(topic, target_words, api_keys, produkty_db, products_loaded
     
     for i, section_title in enumerate(section_titles):
         status_text.text(f"✍️ Piszę sekcję {i+1}/{len(section_titles)}: {section_title}")
-        progress_bar.progress(60 + (30 * i / len(section_titles)))
+        progress_bar.progress(0.6 + (0.3 * i / len(section_titles)))
         
         remaining_sections = "\n".join([f"## {s}" for s in section_titles[i+1:]])
         
