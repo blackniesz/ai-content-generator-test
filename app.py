@@ -528,7 +528,7 @@ def main():
         
         target_words = st.slider(
             "🎯 Długość artykułu (słowa)",
-            min_value=1000,
+            min_value=400,
             max_value=5000,
             value=2000,
             step=250,
