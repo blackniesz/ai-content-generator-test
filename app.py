@@ -125,11 +125,6 @@ def main():
         
         # API status
         st.info("🔑 API Keys: Skonfigurowane")
-        
-        st.markdown("---")
-        st.markdown("### 🔗 Przydatne linki")
-        st.markdown("- 📝 [Markdown Guide](https://www.markdownguide.org/)")
-        st.markdown("- 🎨 [Dr Ambroziak](https://drambroziak.com)")
     
     # Main tabs
     tab1, tab2 = st.tabs(["📝 Generuj nowy artykuł", "🔍 Analizuj gotowy tekst"])
