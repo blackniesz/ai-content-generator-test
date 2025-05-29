@@ -6,20 +6,21 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 # Simple product matching - backward compatibility
-def find_matching_products(content, products_db, api_key=None, threshold=0.3):
-    """Find products matching content - simple version"""
-    if not content or not products_db:
+def find_matching_products(topic, section_title, products_db, api_key, threshold=0.3):
+    """Find products matching content - generator compatibility"""
+    if not products_db:
         return []
     
+    # Combine topic and section for better matching
+    content = f"{topic} {section_title}".lower()
     matching_products = []
-    content_lower = content.lower()
     
     for product in products_db:
         # Simple keyword matching
         product_text = f"{product['nazwa']} {product['zastosowanie']}".lower()
         
         # Count matching words
-        content_words = set(content_lower.split())
+        content_words = set(content.split())
         product_words = set(product_text.split())
         common_words = content_words & product_words
         
@@ -29,6 +30,8 @@ def find_matching_products(content, products_db, api_key=None, threshold=0.3):
             if similarity >= threshold:
                 product_copy = product.copy()
                 product_copy['similarity'] = similarity
+                # Add opis field for generator compatibility
+                product_copy['opis'] = product.get('zastosowanie', 'Brak opisu')
                 matching_products.append(product_copy)
     
     # Sort by similarity
