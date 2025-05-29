@@ -295,8 +295,8 @@ def load_products_database():
     """Load products database from embeddings file - backward compatibility function"""
     try:
         # Try to load from embeddings pickle file
-        if os.path.exists('dr_ambroziak_embbedings.pkl'):
-            with open('dr_ambroziak_embbedings.pkl', 'rb') as f:
+        if os.path.exists('dr_ambroziak_embeddings.pkl'):
+            with open('dr_ambroziak_embeddings.pkl', 'rb') as f:
                 data = pickle.load(f)
             
             # Extract products from embeddings data
