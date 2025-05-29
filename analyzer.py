@@ -2,7 +2,7 @@ import streamlit as st
 import anthropic
 import docx
 import io
-from products import analyze_text_for_products, generate_product_suggestion
+from products import analyze_text_for_products, generate_product_suggestion, filter_recommendations_by_quality
 
 def show_analyzer_tab(api_keys, produkty_db, products_loaded):
     """Show the text analyzer tab"""
@@ -94,7 +94,7 @@ def show_analyzer_tab(api_keys, produkty_db, products_loaded):
         if analyze_button and products_loaded:
             with st.spinner("🔍 Analizuję tekst i szukam miejsc na produkty..."):
                 try:
-                    # Analyze text for product opportunities - NAPRAWIONE: bez API key
+                    # Analyze text for product opportunities
                     recommendations = analyze_text_for_products(
                         text_to_analyze, 
                         produkty_db, 
@@ -118,7 +118,6 @@ def show_analyzer_tab(api_keys, produkty_db, products_loaded):
                 except Exception as e:
                     st.error(f"❌ Błąd analizy: {e}")
                     st.error(f"Debug info: {str(e)}")
-    
     
     # Show recommendations if available
     if hasattr(st.session_state, 'product_recommendations') and st.session_state.product_recommendations:
@@ -287,24 +286,6 @@ def show_analyzer_tab(api_keys, produkty_db, products_loaded):
                     st.metric("📈 Średnie dopasowanie", f"{avg_relevance:.1%}")
                 with col4:
                     st.metric("🏆 Wysokiej jakości", high_quality)
-
-def filter_recommendations_by_quality(recommendations, min_threshold=0.4):
-    """Filter out recommendations with very poor thematic relevance"""
-    if not recommendations:
-        return []
-    
-    filtered = []
-    
-    for rec in recommendations:
-        relevance = rec['product'].get('thematic_relevance', rec['product'].get('similarity', 0))
-        
-        if relevance >= min_threshold:
-            filtered.append(rec)
-        else:
-            # Log filtered out recommendations for debugging
-            print(f"Filtered out: {rec['product']['nazwa']} (relevance: {relevance:.2f})")
-    
-    return filtered
 
 def create_recommendations_summary(recommendations):
     """Create a summary text of all recommendations"""
