@@ -1,3 +1,4 @@
+import streamlit as st
 import anthropic
 import openai
 import requests
@@ -527,7 +528,7 @@ def main():
         
         target_words = st.slider(
             "🎯 Długość artykułu (słowa)",
-            min_value=1000,
+            min_value=400,
             max_value=5000,
             value=2000,
             step=250,
@@ -608,7 +609,7 @@ def main():
         article_to_analyze = st.session_state.edited_article or st.session_state.generated_article
         word_count = len(article_to_analyze.split())
         char_count = len(article_to_analyze)
-        char_count_with_spaces = len(article_to_analyze.replace(' ', '')) # Znaki bez spacji
+        char_count_without_spaces = len(article_to_analyze.replace(' ', ''))
         h2_count = article_to_analyze.count('## ')
         
         with col1:
@@ -616,28 +617,28 @@ def main():
         with col2:
             st.metric("🔤 Znaki", f"{char_count} (ze spacjami)")
         with col3:
-            st.metric("🔠 Znaki", f"{char_count_with_spaces} (bez spacji)")
+            st.metric("🔠 Znaki", f"{char_count_without_spaces} (bez spacji)")
         with col4:
             if topic and topic.lower() in article_to_analyze.lower():
                 st.metric("🎯 SEO", "✅")
             else:
                 st.metric("🎯 SEO", "⚠️")
-
-         # Show more detailed stats
+        
+        # Show more detailed stats
         st.markdown("---")
         
         # Detailed statistics
-        col1, col2, col3 = st.columns(3)
+        detail_col1, detail_col2, detail_col3 = st.columns(3)
         
-        with col1:
+        with detail_col1:
             st.metric("📊 Sekcje H2", h2_count)
-        with col2:
+        with detail_col2:
             reading_time = max(1, word_count // 200)  # ~200 words per minute
             st.metric("⏱️ Czas czytania", f"~{reading_time} min")
-        with col3:
+        with detail_col3:
             if word_count > 0:
                 avg_words_per_section = word_count // max(1, h2_count) if h2_count > 0 else word_count
-                st.metric("📝 Średnio słów/sekcja", avg_words_per_section)import streamlit as st
+                st.metric("📝 Średnio słów/sekcja", avg_words_per_section)
         
         st.markdown("---")
         
