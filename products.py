@@ -326,7 +326,7 @@ def load_products_database():
                 return get_demo_products(), True
                 
         else:
-            st.warning("⚠️ Plik dr_ambroziak_embbedings.pkl nie został znaleziony.")
+            st.warning("⚠️ Plik dr_ambroziak_embeddings.pkl nie został znaleziony.")
             return get_demo_products(), True
             
     except Exception as e:
