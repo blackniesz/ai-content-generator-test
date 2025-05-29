@@ -615,9 +615,9 @@ def main():
         with col1:
             st.metric("📝 Słowa", word_count)
         with col2:
-            st.metric("🔤 Znaki", f"{char_count} (ze spacjami)")
+            st.metric("🔤 Znaki ze spacjami", f"{char_count}")
         with col3:
-            st.metric("🔠 Znaki", f"{char_count_without_spaces} (bez spacji)")
+            st.metric("🔠 Znaki bez spacji", f"{char_count_without_spaces}")
         with col4:
             if topic and topic.lower() in article_to_analyze.lower():
                 st.metric("🎯 SEO", "✅")
