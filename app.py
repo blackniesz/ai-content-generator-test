@@ -1,4 +1,18 @@
-import streamlit as st
+# Show more detailed stats
+        st.markdown("---")
+        
+        # Detailed statistics
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            st.metric("📊 Sekcje H2", h2_count)
+        with col2:
+            reading_time = max(1, word_count // 200)  # ~200 words per minute
+            st.metric("⏱️ Czas czytania", f"~{reading_time} min")
+        with col3:
+            if word_count > 0:
+                avg_words_per_section = word_count // max(1, h2_count) if h2_count > 0 else word_count
+                st.metric("📝 Średnio słów/sekcja", avg_words_per_section)import streamlit as st
 import anthropic
 import openai
 import requests
@@ -528,7 +542,7 @@ def main():
         
         target_words = st.slider(
             "🎯 Długość artykułu (słowa)",
-            min_value=400,
+            min_value=1000,
             max_value=5000,
             value=2000,
             step=250,
@@ -548,8 +562,12 @@ def main():
         # Article history
         if st.session_state.article_history:
             st.subheader("📚 Historia artykułów")
-            for i, (topic, timestamp) in enumerate(st.session_state.article_history[-5:]):
-                st.text(f"{i+1}. {topic} ({timestamp})")
+            for i, (topic, timestamp, article) in enumerate(st.session_state.article_history[-5:]):
+                if st.button(f"{i+1}. {topic} ({timestamp})", key=f"history_{i}"):
+                    # Load article from history
+                    st.session_state.generated_article = article
+                    st.session_state.edited_article = article
+                    st.rerun()
     
     # Main content
     col1, col2 = st.columns([2, 1])
@@ -588,7 +606,7 @@ def main():
                 
                 # Add to history
                 timestamp = time.strftime("%H:%M")
-                st.session_state.article_history.append((topic.strip(), timestamp))
+                st.session_state.article_history.append((topic.strip(), timestamp, article))
                 
                 st.rerun()
                 
@@ -605,14 +623,15 @@ def main():
         article_to_analyze = st.session_state.edited_article or st.session_state.generated_article
         word_count = len(article_to_analyze.split())
         char_count = len(article_to_analyze)
+        char_count_with_spaces = len(article_to_analyze.replace(' ', '')) # Znaki bez spacji
         h2_count = article_to_analyze.count('## ')
         
         with col1:
             st.metric("📝 Słowa", word_count)
         with col2:
-            st.metric("🔤 Znaki", char_count)
+            st.metric("🔤 Znaki", f"{char_count} (ze spacjami)")
         with col3:
-            st.metric("📋 Sekcje H2", h2_count)
+            st.metric("🔠 Znaki", f"{char_count_with_spaces} (bez spacji)")
         with col4:
             if topic and topic.lower() in article_to_analyze.lower():
                 st.metric("🎯 SEO", "✅")
