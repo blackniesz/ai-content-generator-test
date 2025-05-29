@@ -441,7 +441,7 @@ def generate_article(topic, target_words, api_keys, produkty_db, products_loaded
     
     # Step 3: Fact analysis
     status_text.text("🤖 Analizuję fakty przez Claude...")
-    progress_bar.progress(0.40)
+    progress_bar.progress(0.4)
     
     facts = analyze_facts(all_content, topic, api_keys['anthropic'])
     
