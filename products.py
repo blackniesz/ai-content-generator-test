@@ -6,6 +6,8 @@ import re
 import anthropic
 import pandas as pd
 import streamlit as st
+import pickle
+import os
 
 # Klasyfikacja typów akapitów
 PARAGRAPH_TYPES = {
@@ -290,33 +292,46 @@ def calculate_semantic_similarity(text1, text2):
 
 # Backward compatibility functions for generator.py and app.py
 def load_products_database():
-    """Load products database - backward compatibility function"""
+    """Load products database from embeddings file - backward compatibility function"""
     try:
-        # Try to load from CSV if it exists
-        df = pd.read_csv('produkty_dr_ambroziak.csv')
-        
-        # Convert DataFrame to list of dictionaries
-        products = []
-        for _, row in df.iterrows():
-            product = {
-                'nazwa': row.get('nazwa', ''),
-                'zastosowanie': row.get('zastosowanie', ''),
-                'cena': row.get('cena', 'N/A'),
-                'url': row.get('url', '#')
-            }
-            # Skip empty products
-            if product['nazwa'] and product['zastosowanie']:
-                products.append(product)
-        
-        return products
-        
-    except FileNotFoundError:
-        # Return demo products if CSV doesn't exist
-        st.warning("⚠️ Plik produkty_dr_ambroziak.csv nie został znaleziony. Używam przykładowych produktów.")
-        return get_demo_products()
+        # Try to load from embeddings pickle file
+        if os.path.exists('dr_ambroziak_embbedings.pkl'):
+            with open('dr_ambroziak_embbedings.pkl', 'rb') as f:
+                data = pickle.load(f)
+            
+            # Extract products from embeddings data
+            products = []
+            
+            # Handle different possible structures of the pickle file
+            if isinstance(data, dict):
+                if 'products' in data:
+                    products = data['products']
+                elif 'produkty' in data:
+                    products = data['produkty']
+                else:
+                    # Try to extract from embeddings structure
+                    for key, value in data.items():
+                        if isinstance(value, dict) and 'nazwa' in value:
+                            products.append(value)
+                        elif isinstance(value, list):
+                            products.extend([item for item in value if isinstance(item, dict) and 'nazwa' in item])
+            elif isinstance(data, list):
+                products = [item for item in data if isinstance(item, dict) and 'nazwa' in item]
+            
+            if products:
+                st.success(f"✅ Wczytano {len(products)} produktów z bazy embeddings")
+                return products, True
+            else:
+                st.warning("⚠️ Plik embeddings nie zawiera danych produktów w oczekiwanym formacie.")
+                return get_demo_products(), True
+                
+        else:
+            st.warning("⚠️ Plik dr_ambroziak_embbedings.pkl nie został znaleziony.")
+            return get_demo_products(), True
+            
     except Exception as e:
         st.error(f"❌ Błąd wczytywania bazy produktów: {e}")
-        return get_demo_products()
+        return get_demo_products(), True
 
 def get_demo_products():
     """Return demo products for testing"""
