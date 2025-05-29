@@ -1,18 +1,3 @@
-# Show more detailed stats
-        st.markdown("---")
-        
-        # Detailed statistics
-        col1, col2, col3 = st.columns(3)
-        
-        with col1:
-            st.metric("📊 Sekcje H2", h2_count)
-        with col2:
-            reading_time = max(1, word_count // 200)  # ~200 words per minute
-            st.metric("⏱️ Czas czytania", f"~{reading_time} min")
-        with col3:
-            if word_count > 0:
-                avg_words_per_section = word_count // max(1, h2_count) if h2_count > 0 else word_count
-                st.metric("📝 Średnio słów/sekcja", avg_words_per_section)import streamlit as st
 import anthropic
 import openai
 import requests
@@ -637,6 +622,22 @@ def main():
                 st.metric("🎯 SEO", "✅")
             else:
                 st.metric("🎯 SEO", "⚠️")
+
+         # Show more detailed stats
+        st.markdown("---")
+        
+        # Detailed statistics
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            st.metric("📊 Sekcje H2", h2_count)
+        with col2:
+            reading_time = max(1, word_count // 200)  # ~200 words per minute
+            st.metric("⏱️ Czas czytania", f"~{reading_time} min")
+        with col3:
+            if word_count > 0:
+                avg_words_per_section = word_count // max(1, h2_count) if h2_count > 0 else word_count
+                st.metric("📝 Średnio słów/sekcja", avg_words_per_section)import streamlit as st
         
         st.markdown("---")
         
