@@ -119,6 +119,7 @@ def show_analyzer_tab(api_keys, produkty_db, products_loaded):
                     st.error(f"❌ Błąd analizy: {e}")
                     st.error(f"Debug info: {str(e)}")
     
+    
     # Show recommendations if available
     if hasattr(st.session_state, 'product_recommendations') and st.session_state.product_recommendations:
         st.markdown("---")
