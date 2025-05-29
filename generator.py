@@ -15,7 +15,7 @@ def show_generator_tab(api_keys, produkty_db, products_loaded):
         
         target_words = st.slider(
             "🎯 Długość artykułu (słowa)",
-            min_value=1000,
+            min_value=400,
             max_value=5000,
             value=2000,
             step=250,
