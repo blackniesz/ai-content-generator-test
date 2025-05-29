@@ -424,13 +424,13 @@ def generate_article(topic, target_words, api_keys, produkty_db, products_loaded
     
     # Step 1: Competition analysis
     status_text.text("🔍 Analizuję konkurencję...")
-    progress_bar.progress(10)
+    progress_bar.progress(0.1)
     
     competition = search_competition(topic, api_keys['google_api'], api_keys['google_cx'])
     
     # Step 2: Information gathering
     status_text.text("📚 Zbiera informacje...")
-    progress_bar.progress(25)
+    progress_bar.progress(0.25)
     
     search_results = search_information(topic, api_keys['google_api'], api_keys['google_cx'])
     all_content = ""
@@ -441,13 +441,13 @@ def generate_article(topic, target_words, api_keys, produkty_db, products_loaded
     
     # Step 3: Fact analysis
     status_text.text("🤖 Analizuję fakty przez Claude...")
-    progress_bar.progress(40)
+    progress_bar.progress(0.40)
     
     facts = analyze_facts(all_content, topic, api_keys['anthropic'])
     
     # Step 4: Create outline
     status_text.text("📋 Tworzę konspekt...")
-    progress_bar.progress(55)
+    progress_bar.progress(0.55)
     
     outline = create_outline(topic, facts, target_words, api_keys['anthropic'])
     
@@ -486,7 +486,7 @@ def generate_article(topic, target_words, api_keys, produkty_db, products_loaded
     
     # Step 6: Finalize article
     status_text.text("📄 Finalizuję artykuł...")
-    progress_bar.progress(95)
+    progress_bar.progress(0.95)
     
     final_article = f"# {title}\n\n"
     if intro:
@@ -497,7 +497,7 @@ def generate_article(topic, target_words, api_keys, produkty_db, products_loaded
     if "dr ambroziak" not in final_article.lower() and products_loaded:
         final_article += f"\n\n---\n\n**Profesjonalna pielęgnacja skóry** to podstawa zdrowia i piękna. Jeśli szukasz skutecznych kosmetyków opartych na najnowszych osiągnięciach dermatologii, sprawdź [ofertę Dr Ambroziak Laboratorium](https://drambroziak.com) - produkty stworzone przez ekspertów z ponad 20-letnim doświadczeniem."
     
-    progress_bar.progress(100)
+    progress_bar.progress(1.0)
     status_text.text("✅ Artykuł gotowy!")
     
     return final_article
