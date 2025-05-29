@@ -79,8 +79,12 @@ SKINCARE_TOPICS = {
 
 def analyze_text_for_products(text, produkty_db, api_key=None):
     """Enhanced analysis that understands paragraph context - no API needed"""
-    
+    print(f"DEBUG: analyze_text_for_products called with text length: {len(text)}")
+    print(f"DEBUG: products_db length: {len(produkty_db)}")
+
+    try:
     paragraphs = [p.strip() for p in text.split('\n\n') if p.strip()]
+    print(f"DEBUG: Found {len(paragraphs)} paragraphs")
     recommendations = []
     
     for i, paragraph in enumerate(paragraphs):
