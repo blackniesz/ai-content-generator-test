@@ -77,8 +77,8 @@ SKINCARE_TOPICS = {
     }
 }
 
-def analyze_text_for_products(text, produkty_db, anthropic_api_key):
-    """Enhanced analysis that understands paragraph context using Claude"""
+def analyze_text_for_products(text, produkty_db, api_key=None):
+    """Enhanced analysis that understands paragraph context - no API needed"""
     
     paragraphs = [p.strip() for p in text.split('\n\n') if p.strip()]
     recommendations = []
