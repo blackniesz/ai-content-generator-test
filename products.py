@@ -440,6 +440,24 @@ Styl: przyjazny, zachęcający, autentyczny.
     except Exception as e:
         return f"Błąd generowania treści: {e}"
 
+def filter_recommendations_by_quality(recommendations, min_threshold=0.4):
+    """Filter out recommendations with very poor thematic relevance"""
+    if not recommendations:
+        return []
+    
+    filtered = []
+    
+    for rec in recommendations:
+        relevance = rec['product'].get('thematic_relevance', rec['product'].get('similarity', 0))
+        
+        if relevance >= min_threshold:
+            filtered.append(rec)
+        else:
+            # Log filtered out recommendations for debugging
+            print(f"Filtered out: {rec['product']['nazwa']} (relevance: {relevance:.2f})")
+    
+    return filtered
+
 def generate_product_suggestion(paragraph_text, product, suggestion_type, anthropic_client):
     """Generate contextual product suggestion with better context understanding"""
     
