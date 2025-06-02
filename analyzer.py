@@ -306,7 +306,7 @@ def create_recommendations_summary(recommendations):
         summary += f"Link: {rec['product']['url']}\n\n"
         
         summary += f"ORYGINALNY FRAGMENT:\n"
-        summary += f'"{rec['paragraph_text']}"\n\n'
+        summary += f"\"{rec['paragraph_text']}\"\n\n"
         
         # Add main topics if available
         if 'main_topics' in rec and rec['main_topics']:

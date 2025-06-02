@@ -25,7 +25,7 @@ def find_matching_products(topic, section_title, products_db, api_key, threshold
         common_words = content_words & product_words
         
         if len(common_words) >= 2:  # At least 2 common words
-            similarity = len(common_words) / max(len(product_words), 5)
+            similarity = len(common_words) / max(len(product_words), 1)
             
             if similarity >= threshold:
                 product_copy = product.copy()
@@ -194,11 +194,19 @@ def filter_recommendations_by_quality(recommendations, min_threshold=0.4):
 # Load products database
 def load_products_database():
     """Load products database from embeddings file"""
+    print("DEBUG: Attempting to load dr_ambroziak_embeddings.pkl...")
     try:
         # Try to load from embeddings pickle file
         if os.path.exists('dr_ambroziak_embeddings.pkl'):
+            st.info("Trwa próba załadowania głównej bazy produktów (dr_ambroziak_embeddings.pkl). Ten plik jest duży i jego ładowanie może zająć dużo czasu lub zakończyć się niepowodzeniem przy niewystarczających zasobach.")
             with open('dr_ambroziak_embeddings.pkl', 'rb') as f:
                 data = pickle.load(f)
+                print("DEBUG: Successfully loaded dr_ambroziak_embeddings.pkl.")
+                print(f"DEBUG: Type of loaded data: {type(data)}") # This is fine
+                if isinstance(data, dict):
+                    print(f"DEBUG: Keys in loaded data: {data.keys()}") # This is fine
+                elif isinstance(data, list):
+                    print(f"DEBUG: Length of loaded list: {len(data)}") # This is fine
             
             # Extract products from embeddings data
             products = []
@@ -220,18 +228,31 @@ def load_products_database():
                 products = [item for item in data if isinstance(item, dict) and 'nazwa' in item]
             
             if products:
-                st.success(f"✅ Wczytano {len(products)} produktów z bazy embeddings")
+                print(f"DEBUG: First product entry: {products[0]}")
+                if isinstance(products[0], dict):
+                    print(f"DEBUG: Keys in first product: {products[0].keys()}")
+                    # Try to identify a likely embedding key
+                    for key, value in products[0].items():
+                        if isinstance(value, list) and len(value) > 100: # Heuristic for an embedding
+                            print(f"DEBUG: Potential embedding found for key '{key}' with length {len(value)}")
+                        elif 'embedding' in key.lower() or 'vector' in key.lower():
+                             print(f"DEBUG: Potential embedding found for key '{key}'")
+                print(f"INFO: ✅ Wczytano {len(products)} produktów z bazy embeddings")
                 return products, True
             else:
-                st.warning("⚠️ Plik embeddings nie zawiera danych produktów w oczekiwanym formacie.")
+                print("WARNING: ⚠️ Plik embeddings nie zawiera danych produktów w oczekiwanym formacie.")
+                print("DEBUG: Falling back to get_demo_products().")
                 return get_demo_products(), True
                 
         else:
-            st.warning("⚠️ Plik dr_ambroziak_embeddings.pkl nie został znaleziony.")
+            st.warning("Nie znaleziono pliku dr_ambroziak_embeddings.pkl. Używam tymczasowej, demonstracyjnej bazy produktów.")
+            print("DEBUG: Falling back to get_demo_products().")
             return get_demo_products(), True
             
     except Exception as e:
-        st.error(f"❌ Błąd wczytywania bazy produktów: {e}")
+        print(f"DEBUG: Exception during pickle loading: {e}") # This is a useful debug print
+        st.error(f"Błąd podczas ładowania dr_ambroziak_embeddings.pkl: {e}. Używam tymczasowej, demonstracyjnej bazy produktów.")
+        print("DEBUG: Falling back to get_demo_products().")
         return get_demo_products(), True
 
 def get_demo_products():

@@ -1,8 +1,8 @@
 import streamlit as st
 from generator import show_generator_tab
 from analyzer import show_analyzer_tab
-from products import load_products_database
-
+from products import load_products_database, get_demo_products # Added get_demo_products
+# import sys # No longer needed here, will be imported in main()
 # ========================================
 # KONFIGURACJA STRONY
 # ========================================
@@ -112,19 +112,32 @@ def main():
         produkty_db, products_loaded = load_products_database()
         st.session_state.produkty_db = produkty_db
         st.session_state.products_loaded = products_loaded
+        # Removed old DEBUG prints and sys.exit()
+
+    # Check if demo products are being used
+    demo_products = get_demo_products()
+    is_demo_data = False
+    if st.session_state.produkty_db and len(st.session_state.produkty_db) == len(demo_products):
+        if demo_products and st.session_state.produkty_db and demo_products[0]['nazwa'] == st.session_state.produkty_db[0]['nazwa']:
+             is_demo_data = True
     
+    if not st.session_state.products_loaded or not st.session_state.produkty_db:
+        is_demo_data = True # Treat as demo/fallback if not properly loaded
+
     # Sidebar z globalnym statusem
     with st.sidebar:
+        if is_demo_data:
+            st.error("⚠️ UWAGA: System używa obecnie tymczasowej, demonstracyjnej bazy produktów. Główne dane produktów nie mogły zostać załadowane. Funkcjonalność może być ograniczona, a rekomendacje pochodzić z małego zbioru demonstracyjnego.")
+        
         st.title("⚙️ Status systemu")
-        
-        # Products status
-        if st.session_state.products_loaded:
+        if st.session_state.products_loaded and not is_demo_data:
             st.success(f"✅ Baza produktów: {len(st.session_state.produkty_db)} produktów")
+        elif is_demo_data:
+             st.warning(f"⚠️ Baza produktów: Aktywna baza demonstracyjna ({len(st.session_state.produkty_db) if st.session_state.produkty_db else 0} prod.)")
         else:
-            st.warning("⚠️ Baza produktów: niedostępna")
+            st.warning("⚠️ Baza produktów: niedostępna lub błąd ładowania")
         
-        # API status
-        st.info("🔑 API Keys: Skonfigurowane")
+        st.info("🔑 API Keys: Skonfigurowane") # Assuming API keys are fine
     
     # Main tabs
     tab1, tab2 = st.tabs(["📝 Generuj nowy artykuł", "🔍 Analizuj gotowy tekst"])
