@@ -39,6 +39,8 @@ def find_matching_products(topic, section_title, products_db, api_key, threshold
     return matching_products[:5]
 
 # Simple analysis function
+# Replace the analyze_text_for_products function in products.py with this corrected version:
+
 def analyze_text_for_products(text, produkty_db, api_key=None):
     """Simple analysis that finds product opportunities"""
     if not text or not produkty_db:
@@ -58,8 +60,10 @@ def analyze_text_for_products(text, produkty_db, api_key=None):
            not any(solution in paragraph_lower for solution in ['leczenie', 'terapia', 'stosować', 'pomocne', 'warto']):
             continue
         
-        # Find matching products for this paragraph
-        matches = find_matching_products(paragraph, produkty_db, threshold=0.2)
+        # FIX: Call find_matching_products with correct parameters
+        # Changed from: find_matching_products(paragraph, produkty_db, threshold=0.2)
+        # To: find_matching_products(paragraph, "", produkty_db, api_key, threshold=0.2)
+        matches = find_matching_products(paragraph, "", produkty_db, api_key, threshold=0.2)
         
         for product in matches[:2]:  # Max 2 per paragraph
             recommendations.append({
